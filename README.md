@@ -63,15 +63,21 @@ See [blog.md](blog.md) Step 7 for full configuration. Quick version:
 
 Available on [prefix.dev/channels/repo](https://prefix.dev/channels/repo):
 
-| Platform | Status |
-|:--|:--|
-| osx-arm64 | available |
-| linux-64 | available |
-| linux-aarch64 | available |
-
 ```bash
+# macOS (Apple Silicon) — Metal GPU
 pixi add --channel https://repo.prefix.dev/repo llama-cpp-turboquant
+
+# Linux — CPU + auto-detect CUDA
+pixi add --channel https://repo.prefix.dev/repo llama-cpp-turboquant
+
+# Linux — NVIDIA CUDA GPU (requires CUDA 12+)
+pixi add --channel https://repo.prefix.dev/repo llama-cpp-turboquant-cuda
 ```
+
+| Package | Platform | GPU |
+|:--|:--|:--|
+| `llama-cpp-turboquant` | osx-arm64, linux-64, linux-aarch64 | Metal (macOS), CPU (Linux) |
+| `llama-cpp-turboquant-cuda` | linux-64 | NVIDIA CUDA 12+ |
 
 ## Acknowledgments
 

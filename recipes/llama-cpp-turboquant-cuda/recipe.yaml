@@ -1,0 +1,35 @@
+schema_version: 1
+
+package:
+  name: llama-cpp-turboquant-cuda
+  version: "0.0.8659"
+
+source:
+  git: https://github.com/TheTom/llama-cpp-turboquant.git
+  branch: feature/turboquant-kv-cache
+  depth: 1
+
+build:
+  number: 1
+
+requirements:
+  build:
+    - ${{ compiler('c') }}
+    - ${{ compiler('cxx') }}
+    - ${{ compiler('cuda') }}
+    - cmake >=3.20
+    - ninja
+    - git
+  host:
+    - cuda-version >=12.0
+    - libcublas-dev
+    - cuda-cudart-dev
+  run:
+    - cuda-version >=12.0
+
+about:
+  homepage: https://github.com/TheTom/llama-cpp-turboquant
+  license: MIT
+  license_file: LICENSE
+  summary: llama.cpp with TurboQuant KV cache compression — NVIDIA CUDA GPU build
+  repository: https://github.com/TheTom/llama-cpp-turboquant
