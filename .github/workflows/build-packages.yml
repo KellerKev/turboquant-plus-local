@@ -6,8 +6,10 @@ on:
     paths:
       - 'recipes/**'
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
-  # CPU + Metal builds (all platforms)
   build:
     strategy:
       fail-fast: false
@@ -19,8 +21,6 @@ jobs:
             os: ubuntu-24.04-arm
           - platform: osx-arm64
             os: macos-14
-          - platform: osx-64
-            os: macos-13
           - platform: win-64
             os: windows-latest
 
@@ -30,11 +30,17 @@ jobs:
         with:
           submodules: true
 
-      - name: Install pixi
-        uses: prefix-dev/setup-pixi@v0.8.1
+      - name: Install rattler-build (unix)
+        if: runner.os != 'Windows'
+        run: |
+          curl -fsSL https://pixi.sh/install.sh | bash
+          ~/.pixi/bin/pixi global install rattler-build
 
-      - name: Install rattler-build
-        run: pixi global install rattler-build
+      - name: Install rattler-build (windows)
+        if: runner.os == 'Windows'
+        run: |
+          iwr -useb https://pixi.sh/install.ps1 | iex
+          pixi global install rattler-build
 
       - name: Build llama-cpp-turboquant
         run: rattler-build build --recipe recipes/llama-cpp-turboquant/recipe.yaml --output-dir conda-output
@@ -49,18 +55,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: llama-cpp-turboquant-${{ matrix.platform }}
-          path: conda-output/${{ matrix.platform }}/*.conda
+          path: conda-output/**/*.conda
 
-  # CUDA build (Linux only — requires NVIDIA GPU runners or CUDA toolkit)
   build-cuda:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: linux-64
-            os: ubuntu-latest
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -69,14 +67,13 @@ jobs:
       - name: Install CUDA toolkit
         uses: Jimver/cuda-toolkit@v0.2.19
         with:
-          cuda: '12.6.3'
+          cuda: '12.6.0'
           method: network
 
-      - name: Install pixi
-        uses: prefix-dev/setup-pixi@v0.8.1
-
       - name: Install rattler-build
-        run: pixi global install rattler-build
+        run: |
+          curl -fsSL https://pixi.sh/install.sh | bash
+          ~/.pixi/bin/pixi global install rattler-build
 
       - name: Build llama-cpp-turboquant-cuda
         run: rattler-build build --recipe recipes/llama-cpp-turboquant-cuda/recipe.yaml --output-dir conda-output
@@ -85,10 +82,10 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           rattler-build upload prefix -a "${{ secrets.PREFIX_DEV_TOKEN }}" -c repo \
-            conda-output/${{ matrix.platform }}/*.conda
+            conda-output/linux-64/*.conda
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: llama-cpp-turboquant-cuda-${{ matrix.platform }}
-          path: conda-output/${{ matrix.platform }}/*.conda
+          name: llama-cpp-turboquant-cuda-linux-64
+          path: conda-output/**/*.conda
