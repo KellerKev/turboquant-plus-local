@@ -1,5 +1,5 @@
 [workspace]
-authors = ["Kevin Keller <kellerkev@gmail.com>"]
+authors = ["Kevin Keller"]
 channels = ["conda-forge"]
 name = "turboquant-plus"
 platforms = ["osx-arm64"]
