@@ -1,0 +1,20 @@
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+pixi.lock
+
+# Build outputs
+llama-cpp-turboquant/build/
+conda-output/
+
+# Models (large files)
+models/
+
+# macOS
+.DS_Store
+
+# Claude
+.claude/
+
+# Blog draft (not published)
+blog.md

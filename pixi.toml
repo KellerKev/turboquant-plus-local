@@ -1,0 +1,40 @@
+[workspace]
+authors = ["Kevin Keller <kellerkev@gmail.com>"]
+channels = ["conda-forge"]
+name = "turboquant-plus"
+platforms = ["osx-arm64"]
+version = "0.1.0"
+
+[dependencies]
+cmake = ">=3.28"
+ninja = ">=1.11"
+compilers = ">=1.0"
+llvm-openmp = ">=15.0"
+huggingface_hub = ">=1.9.0,<2"
+
+[tasks]
+# Build llama-cpp-turboquant (Metal + BLAS + OpenMP)
+configure = { cmd = """cmake -B llama-cpp-turboquant/build -S llama-cpp-turboquant -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DGGML_METAL=ON \
+  -DGGML_BLAS=ON \
+  -DGGML_OPENMP=ON""", description = "Configure llama-cpp-turboquant (Metal + BLAS + OpenMP)" }
+build = { cmd = "cmake --build llama-cpp-turboquant/build -j16", depends-on = ["configure"], description = "Build llama-cpp-turboquant" }
+
+# Download models
+download-gemma4 = { cmd = """python -c "from huggingface_hub import hf_hub_download; hf_hub_download('bartowski/google_gemma-4-26B-A4B-it-GGUF', 'google_gemma-4-26B-A4B-it-Q4_K_M.gguf', local_dir='models')" """, description = "Download Gemma 4 26B Q4_K_M" }
+download-qwen35-4b = { cmd = """python -c "from huggingface_hub import hf_hub_download; hf_hub_download('bartowski/Qwen_Qwen3.5-4B-GGUF', 'Qwen_Qwen3.5-4B-Q4_K_M.gguf', local_dir='models')" """, description = "Download Qwen3.5 4B Q4_K_M" }
+
+# Run server
+serve = { cmd = """llama-cpp-turboquant/build/bin/llama-server \
+  -m models/google_gemma-4-26B-A4B-it-Q4_K_M.gguf \
+  --port 8092 \
+  -ctk q8_0 -ctv turbo3 \
+  -fa on -ngl 99 -c 16384 \
+  --threads 12 --jinja --reasoning-budget 0""", depends-on = ["build"], description = "Start TurboQuant+ server with Gemma 4 26B" }
+
+# Benchmark
+bench = { cmd = "llama-cpp-turboquant/build/bin/llama-bench -m models/google_gemma-4-26B-A4B-it-Q4_K_M.gguf -p 512 -n 128 -r 3", depends-on = ["build"], description = "Run benchmark" }
+
+# Package
+package = { cmd = "rattler-build build --recipe recipes/llama-cpp-turboquant/recipe.yaml --output-dir conda-output", description = "Build conda package (requires: pixi global install rattler-build)" }

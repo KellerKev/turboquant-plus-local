@@ -1,0 +1,47 @@
+name: Build and Upload Conda Packages
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'recipes/llama-cpp-turboquant/**'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux-64
+            os: ubuntu-latest
+          - platform: osx-arm64
+            os: macos-14
+          - platform: osx-64
+            os: macos-13
+          - platform: win-64
+            os: windows-latest
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pixi
+        uses: prefix-dev/setup-pixi@v0.8.1
+
+      - name: Install rattler-build
+        run: pixi global install rattler-build
+
+      - name: Build llama-cpp-turboquant
+        run: rattler-build build --recipe recipes/llama-cpp-turboquant/recipe.yaml --output-dir conda-output
+
+      - name: Upload to prefix.dev
+        if: github.ref == 'refs/heads/main'
+        run: |
+          rattler-build upload prefix -a "${{ secrets.PREFIX_DEV_TOKEN }}" -c repo \
+            conda-output/${{ matrix.platform }}/*.conda
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: llama-cpp-turboquant-${{ matrix.platform }}
+          path: conda-output/${{ matrix.platform }}/*.conda
