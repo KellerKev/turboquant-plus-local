@@ -27,7 +27,6 @@ pixi run serve
 - **llama-cpp-turboquant** — llama.cpp fork with native TurboQuant KV compression
 - **pixi.toml** — reproducible build with cmake, ninja, compilers from conda-forge
 - **recipes/** — rattler-build recipe for conda packaging
-- **blog.md** — full walkthrough with benchmarks and opencode setup
 - **.github/workflows/** — CI for multi-platform package builds
 
 ## Benchmarks (Mac Studio M4 Max, 128 GB)
@@ -41,7 +40,7 @@ pixi run serve
 
 ## Using with opencode
 
-See [blog.md](blog.md) Step 7 for full configuration. Quick version:
+Quick configuration:
 
 ```json
 {
