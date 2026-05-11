@@ -2,6 +2,8 @@
 
 > **Based on [TheTom/turboquant_plus](https://github.com/TheTom/turboquant_plus).**
 
+> **Disclaimer:** This is a proof-of-tech for educational and "art of the possible" purposes, put together in spare time. It is not meant for production, nor is it supported or endorsed by Snowflake.
+
 Build and run local LLMs with [TurboQuant KV cache compression](https://github.com/TheTom/turboquant_plus) — 5.1x less memory for the KV cache, enabling longer context on the same hardware.
 
 ## Quick Start
