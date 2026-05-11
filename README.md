@@ -1,5 +1,7 @@
 # TurboQuant+ Local LLM Setup
 
+> **Based on [TheTom/turboquant_plus](https://github.com/TheTom/turboquant_plus)** — all the TurboQuant research, kernels (Metal/CUDA/Vulkan/ROCm), and the [llama-cpp-turboquant](https://github.com/TheTom/llama-cpp-turboquant) llama.cpp fork are TheTom's work. This repo only adds pixi build configuration, conda packaging, multi-platform CI, opencode integration, and benchmarks.
+
 Build and run local LLMs with [TurboQuant KV cache compression](https://github.com/TheTom/turboquant_plus) — 5.1x less memory for the KV cache, enabling longer context on the same hardware.
 
 ## Quick Start
